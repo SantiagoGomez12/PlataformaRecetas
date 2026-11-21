@@ -1,0 +1,158 @@
+﻿@model List<PlataformaRecetas.Models.Receta>
+
+<style>
+            .contenedor {
+                width: 850px;
+                margin: 30px auto;
+                padding: 20px;
+            }
+
+            .campo {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .receta {
+                border: 1px solid gray;
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .boton {
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+
+            .favorita {
+                color: red;
+            }
+</style>
+
+<div class="contenedor">
+
+    <h1>Mi Plataforma de Recetas</h1>
+
+    <p>Busca y descubre recetas de cocina.</p>
+
+    <form asp-controller="Recetas"
+          asp-action="Index"
+          method="get">
+
+        <p>Buscar receta o ingrediente:</p>
+
+        <input type="text"
+               name="busqueda"
+               value="@ViewBag.Busqueda"
+               class="campo"
+               placeholder="Ejemplo: pollo, chocolate..." />
+
+        <p>Filtrar por categoría:</p>
+
+        <select name="categoria" class="campo">
+
+                    <option value="">Todas las categorías</option>
+
+                    <option value="Desayuno"
+                            selected="@(ViewBag.Categoria == "Desayuno")">
+                        Desayunos
+                    </option>
+
+                    <option value="Almuerzo"
+                            selected="@(ViewBag.Categoria == "Almuerzo")">
+                        Almuerzos
+                    </option>
+
+                    <option value="Postre"
+                            selected="@(ViewBag.Categoria == "Postre")">
+                        Postres
+                    </option>
+
+        </select>
+
+        <button type="submit" class="boton">Buscar</button>
+
+        <a asp-controller="Recetas" asp-action="Index">
+            Mostrar todas
+        </a>
+
+    </form>
+
+    <hr />
+
+    <h2>Recetas disponibles</h2>
+
+    @if (Model.Count == 0)
+    {
+        <p>No se encontraron recetas.</p>
+    }
+
+    @foreach (var receta in Model)
+    {
+        <div class="receta">
+
+                        <h2>@receta.Nombre</h2>
+
+                        <p><strong>Categoria:</strong> @receta.Categoria</p>
+
+                        <h4>Ingredientes:</h4>
+
+                        <p>@receta.Ingredientes</p>
+
+                        <h4>Preparacion:</h4>
+
+                        <p>@receta.Preparacion</p>
+
+                    <form asp-controller="Recetas"
+                          asp-action="Favorito"
+                          method="post">
+
+                        <input type="hidden"
+                               name="id"
+                               value="@receta.Id" />
+
+                <button type="submit" class="boton">
+
+                            @if (receta.Favorita)
+                            {
+                                <span class="favorita">Quitar de favoritos</span>
+                            }
+                            else
+                            {
+                                <span>Guardar en favoritos</span>
+                    }
+
+                </button>
+
+            </form>
+
+                    <button type="button"
+                            class="boton"
+                            onclick="compartir(this)">
+                        Compartir receta
+                      </button>
+
+        </div>
+    }
+
+</div>
+
+<script>
+
+    function compartir(boton)
+    {
+        var receta = boton.parentElement.innerText;
+
+        if (navigator.share)
+                {
+                    navigator.share({
+                        title: "Receta de cocina",
+                        text: receta
+                    });
+                }
+                else
+                {
+                    window.prompt("Copia esta receta para compartirla:", receta);
+                }
+    }
+
+</script>
